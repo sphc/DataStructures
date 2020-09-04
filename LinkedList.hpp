@@ -42,7 +42,7 @@ private:
 };
 
 template <typename T>
-inline LinkedList<T>::LinkedList() : head(nullptr), tail(nullptr) { }
+LinkedList<T>::LinkedList() : head(nullptr), tail(nullptr) { }
 
 template <typename T>
 LinkedList<T>::~LinkedList()
@@ -56,7 +56,7 @@ LinkedList<T>::~LinkedList()
 }
 
 template <typename T>
-inline bool LinkedList<T>::isEmpty() const { return nullptr == head; }
+bool LinkedList<T>::isEmpty() const { return nullptr == head; }
 
 template <typename T>
 bool LinkedList<T>::isInList(const T &obj) const
@@ -69,7 +69,7 @@ bool LinkedList<T>::isInList(const T &obj) const
 }
 
 template <typename T>
-inline void LinkedList<T>::addToHead(const T &obj)
+void LinkedList<T>::addToHead(const T &obj)
 {
     if (isEmpty()) {
         head = tail = new Node(obj);
@@ -79,7 +79,7 @@ inline void LinkedList<T>::addToHead(const T &obj)
 }
 
 template <typename T>
-inline void LinkedList<T>::addToTail(const T &obj)
+void LinkedList<T>::addToTail(const T &obj)
 {
     if (isEmpty()) {
         head = tail = new Node(obj);
@@ -130,6 +130,7 @@ void LinkedList<T>::deleteNode(const T &obj)
     Node *q = *p;
     *p = (*p)->next;
     delete q;
+    if (nullptr == head) { tail = nullptr; }
 }
 
 #endif
