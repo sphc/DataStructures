@@ -7,19 +7,20 @@
 //        Author: sphc - jinkai0916@outlook.com
 //   Description: ---
 //       Created: 2020-08-25 14:45:55
-// Last Modified: 2020-09-04 04:34:31
+// Last Modified: 2020-09-09 13:01:55
 //
 //================================================
 
 #ifndef VECTOR__H
 #define VECTOR__H
 
-typedef int Rank;
-#define DEFAULT_CAPACITY 3
+const int DefaultCapacity = 3;
 
 template <typename T> class Vector {
 public:
-    Vector(int c = DEFAULT_CAPACITY, int s = 0, T v = 0);
+    typedef int Rank;
+
+    Vector(int c = DefaultCapacity, int s = 0, const T &v = T{});
     Vector(const T *A, Rank n);
     Vector(const T *A, Rank lo, Rank hi);
     Vector(const Vector<T> &V);
@@ -37,7 +38,7 @@ public:
 
     //可写访问接口
     //T &operator[](Rank r) const;
-    Vector<T> &operator=(const Vector<T> &);
+    Vector<T> &operator=(const Vector<T> &rhs);
     T remove(Rank r);
     int remove(Rank lo, Rank hi);
     Rank insert(Rank r, const T &e);
@@ -70,5 +71,35 @@ private:
     void quickSort(Rank lo, Rank hi);
     void heapSort(Rank lo, Rank hi);
 };
+
+template <typename T>
+//T: default_constructable copy_assignable
+Vector<T>::Vector(int c, int s, const T &v) :
+    _capacity(c), _size(0), _elem(new T[c]) // check: size of c
+{
+    //assert 0 <= s && s <= c
+    while (_size < s) {
+        _elem[_size++] = v;
+    }
+}
+
+template <typename T>
+Vector<T>::Vector(const T *A, Rank n) :
+    Vector(A, 0, n) { }
+
+template <typename T>
+Vector<T>::Vector(const T *A, Rank lo, Rank hi);
+
+template <typename T>
+Vector<T>::Vector(const Vector<T> &V) :
+    Vector(V, 0, V.size()) { }
+
+template <typename T>
+//check: value of lo and hi
+Vector<T>::Vector(const Vector<T> &V, Rank lo, Rank hi) :
+    Vector(V._elem, lo, hi) { }
+
+template <typename T>
+Vector<T>::~Vector();
 
 #endif
