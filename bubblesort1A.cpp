@@ -7,7 +7,7 @@
 //        Author: sphc - jinkai0916@outlook.com
 //   Description: ---
 //       Created: 2019-08-17 13:11:11
-// Last Modified: 2020-07-14 20:17:06
+// Last Modified: 2020-09-07 10:38:45
 //
 //================================================
 
@@ -32,7 +32,7 @@ void myBubblesort(int *A, std::size_t n)
                 swap(A[j - 1], A[j]);
                 sorted = false;
             }
-        } 
+        }
     }
 }
 
