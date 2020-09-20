@@ -88,18 +88,26 @@ Vector<T>::Vector(const T *A, Rank n) :
     Vector(A, 0, n) { }
 
 template <typename T>
-Vector<T>::Vector(const T *A, Rank lo, Rank hi);
+//check: value of lo and hi
+Vector<T>::Vector(const T *A, Rank lo, Rank hi) : _size(0)
+{
+    // assert 0 <= lo && lo <= hi
+    _elem = new T[hi - lo];
+    while (lo != hi) {
+        _elem[_size++] = A[lo++];
+    }
+    _capacity = _size;
+}
 
 template <typename T>
 Vector<T>::Vector(const Vector<T> &V) :
     Vector(V, 0, V.size()) { }
 
 template <typename T>
-//check: value of lo and hi
 Vector<T>::Vector(const Vector<T> &V, Rank lo, Rank hi) :
     Vector(V._elem, lo, hi) { }
 
 template <typename T>
-Vector<T>::~Vector();
+Vector<T>::~Vector() { delete [] _elem; }
 
 #endif
