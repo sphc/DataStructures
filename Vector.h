@@ -1,20 +1,18 @@
-//head file
-
-//================================================
-//
-//      Filename: Vector.h
-//
-//        Author: sphc - jinkai0916@outlook.com
-//   Description: ---
-//       Created: 2020-08-25 14:45:55
-// Last Modified: 2020-09-09 13:01:55
-//
-//================================================
+/*
+ * @Author       : sphc
+ * @Description  : ---
+ * @Email        : jinkai0916@outlook.com
+ * @Date         : 2020-08-25 14:45:55
+ * @LastEditors  : sphc
+ * @LastEditTime : 2020-09-21 14:29:46
+ */
 
 #ifndef VECTOR__H
 #define VECTOR__H
 
-const int DefaultCapacity = 3;
+#include <utility>
+
+inline const int DefaultCapacity = 3;
 
 template <typename T> class Vector {
 public:
@@ -28,6 +26,7 @@ public:
     ~Vector();
 
     //只读访问接口
+    const T &operator[](Rank r) const;
     Rank size() const;
     bool empty() const;
     int disordered() const;
@@ -37,7 +36,7 @@ public:
     Rank search(const T &e, Rank lo, Rank hi) const;
 
     //可写访问接口
-    //T &operator[](Rank r) const;
+    T &operator[](Rank r);
     Vector<T> &operator=(const Vector<T> &rhs);
     T remove(Rank r);
     int remove(Rank lo, Rank hi);
@@ -70,12 +69,15 @@ private:
     Rank partition(Rank lo, Rank hi);
     void quickSort(Rank lo, Rank hi);
     void heapSort(Rank lo, Rank hi);
+
+    void free();
+    T *alloc_copy(int capacity, const T *A, Rank lo, Rank hi);
 };
 
 template <typename T>
 //T: default_constructable copy_assignable
 Vector<T>::Vector(int c, int s, const T &v) :
-    _capacity(c), _size(0), _elem(new T[c]) // check: size of c
+    _size(0), _capacity(c), _elem(new T[c]) // check: size of c
 {
     //assert 0 <= s && s <= c
     while (_size < s) {
@@ -89,15 +91,13 @@ Vector<T>::Vector(const T *A, Rank n) :
 
 template <typename T>
 //check: value of lo and hi
-Vector<T>::Vector(const T *A, Rank lo, Rank hi) : _size(0)
-{
-    // assert 0 <= lo && lo <= hi
-    _elem = new T[hi - lo];
-    while (lo != hi) {
-        _elem[_size++] = A[lo++];
-    }
-    _capacity = _size;
-}
+Vector<T>::Vector(const T *A, Rank lo, Rank hi) :
+    _size(hi - lo), _capacity(_size), _elem(alloc_copy(_capacity, A, lo, hi))
+{ }
+
+template <typename T>
+const T &Vector<T>::operator[](Rank r) const
+{ return _elem[r]; }
 
 template <typename T>
 Vector<T>::Vector(const Vector<T> &V) :
@@ -108,6 +108,108 @@ Vector<T>::Vector(const Vector<T> &V, Rank lo, Rank hi) :
     Vector(V._elem, lo, hi) { }
 
 template <typename T>
-Vector<T>::~Vector() { delete [] _elem; }
+Vector<T>::~Vector() { free(); }
+
+
+template <typename T>
+Vector<T>::Rank Vector<T>::size() const
+{ return _size; }
+
+template <typename T>
+bool Vector<T>::empty() const
+{ return 0 == size(); }
+
+// template <typename T>
+// int Vector<T>::disordered() const;
+
+// template <typename T>
+// Vector<T>::Rank Vector<T>::find(const T &e) const;
+
+// template <typename T>
+// Vector<T>::Rank Vector<T>::find(const T &e, Rank lo, Rank hi) const;
+
+// template <typename T>
+// Vector<T>::Rank Vector<T>::search(const T &e) const;
+
+// template <typename T>
+// Vector<T>::Rank Vector<T>::search(const T &e, Rank lo, Rank hi) const;
+
+
+template <typename T>
+T &Vector<T>::operator[](Rank r)
+{ return const_cast<T &>(const_cast<const Vector &>(*this)[r]); }
+
+template <typename T>
+Vector<T> &Vector<T>::operator=(const Vector<T> &rhs)
+{
+    if (this != &rhs) {
+        free();
+        _capacity = _size = rhs.size();
+        _elem = alloc_copy(_capacity, rhs._elem, 0, rhs.size());
+    }
+    return *this;
+}
+
+// template <typename T>
+// T Vector<T>::remove(Rank r);
+
+// template <typename T>
+// int Vector<T>::remove(Rank lo, Rank hi);
+
+template <typename T>
+Vector<T>::Rank Vector<T>::insert(Rank r, const T &e)
+{
+    if (_size == _capacity) {
+        _capacity *= 2;
+        T *newElem = alloc_copy(_capacity, _elem, 0, _size);
+        free();
+        _elem = newElem;
+    }
+    Rank i = _size;
+    while (i != r) {
+        _elem[i] = _elem[i - 1];
+        --i;
+    }
+    _elem[i] = e;
+    ++_size;
+    return r;
+}
+
+template <typename T>
+Vector<T>::Rank Vector<T>::insert(const T &e)
+{ return insert(size(), e); }
+
+// template <typename T>
+// void Vector<T>::sort(Rank lo, Rank hi);
+
+// template <typename T>
+// void Vector<T>::sort();
+
+// template <typename T>
+// void Vector<T>::unsort(Rank lo, Rank hi);
+
+// template <typename T>
+// void Vector<T>::unsort();
+
+// template <typename T>
+// int Vector<T>::deduplicate();
+
+// template <typename T>
+// int Vector<T>::uniquify();
+
+template <typename T>
+void Vector<T>::free() { delete [] _elem; }
+
+template <typename T>
+T *Vector<T>::alloc_copy(int capacity, const T *A, Rank lo, Rank hi)
+{
+    // assert 0 <= lo && lo <= hi
+    T *newElem = new T[capacity];
+    Rank size = 0;
+    while (lo != hi) {
+        newElem[size++] = A[lo++];
+    }
+    return newElem;
+}
 
 #endif
