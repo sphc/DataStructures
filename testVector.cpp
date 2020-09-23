@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-21 14:22:54
+ * @LastEditTime : 2020-09-23 14:06:57
  */
 
 #include "Test.h"
@@ -42,7 +42,35 @@ int main()
     //     std::cout << v8[i] << std::endl;
     // }
     // printVector(v8);
-    // std::cout << v8.size() << std::endl;
+    // std::cout << "v8.size():" << v8.size() << std::endl;
+
+    // v8 = v8;
+    // printVector(v8);
+    // Vector<int> v9;
+    // v9 = v8;
+    // printVector(v9);
+
+    Vector<int> v10;
+    v10.insert(1);
+    v10.insert(2);
+    v10.insert(3);
+    v10.insert(4);
+    v10.insert(5);
+    std::cout << "v10.disordered(): " << v10.disordered() << std::endl;
+    Vector<int> v11;
+    v11.insert(1);
+    v11.insert(3);
+    v11.insert(2);
+    v11.insert(5);
+    v11.insert(4);
+    std::cout << "v11.disordered(): " << v11.disordered() << std::endl;
+    std::cout << "v11.find(2):  " << v11.find(2) << std::endl;
+    std::cout << "v11.find(20):  " << v11.find(20) << std::endl;
+    std::cout << "v11.find(2, 1, 4):  " << v11.find(2, 1, 4) << std::endl;
+    std::cout << "v11.find(20, 1, 4):  " << v11.find(20, 1, 4) << std::endl;
+    // v11.remove(2);
+    v11.remove(2, 4);
+    printVector(v11);
 
     return 0;
 }
