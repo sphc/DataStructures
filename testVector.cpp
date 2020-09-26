@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-23 14:06:57
+ * @LastEditTime : 2020-09-26 17:33:30
  */
 
 #include "Test.h"
@@ -68,8 +68,8 @@ int main()
     std::cout << "v11.find(20):  " << v11.find(20) << std::endl;
     std::cout << "v11.find(2, 1, 4):  " << v11.find(2, 1, 4) << std::endl;
     std::cout << "v11.find(20, 1, 4):  " << v11.find(20, 1, 4) << std::endl;
-    // v11.remove(2);
-    v11.remove(2, 4);
+    v11.remove(2);
+    // v11.remove(2, 4);
     printVector(v11);
 
     return 0;
