@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-26 17:33:30
+ * @LastEditTime : 2020-09-28 14:36:42
  */
 
 #include "Test.h"
@@ -23,6 +23,21 @@ int main()
     // Vector<Test> v1;
     // Vector<Test> v2(5, 3);
     // Vector<Test> v3(5, 3, Test{7});
+    // std::cout << v1.capacity() << std::endl;
+    // v1.insert(1);
+    // v1.insert(1);
+    // v1.insert(1);
+    // v1.insert(1);
+    // v1.insert(1);
+    // std::cout << v1.capacity() << std::endl;
+    // v1 = 4;
+    // std::cout << v1.capacity() << std::endl;
+    // v1.insert(1);
+    // v1.insert(1);
+    // v1.insert(1);
+    // v1.insert(1);
+    // v1.insert(1);
+    // std::cout << v1.capacity() << std::endl;
 
     // const int Size = 5;
     // Test arr[Size];
@@ -68,8 +83,8 @@ int main()
     std::cout << "v11.find(20):  " << v11.find(20) << std::endl;
     std::cout << "v11.find(2, 1, 4):  " << v11.find(2, 1, 4) << std::endl;
     std::cout << "v11.find(20, 1, 4):  " << v11.find(20, 1, 4) << std::endl;
-    v11.remove(2);
-    // v11.remove(2, 4);
+    // v11.remove(2);
+    v11.remove(2, 4);
     printVector(v11);
 
     return 0;

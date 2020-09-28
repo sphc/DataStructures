@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-26 17:31:51
+ * @LastEditTime : 2020-09-28 14:36:21
  */
 
 #ifndef VECTOR__H
@@ -22,7 +22,7 @@ class Vector {
 public:
     typedef int Rank;
 
-    Vector(int c = DefaultCapacity, int s = 0, const T &v = T{});
+    explicit Vector(int c = DefaultCapacity, int s = 0, const T &v = T{});
     Vector(const T *A, Rank n);
     Vector(const T *A, Rank lo, Rank hi);
     Vector(const Vector<T, Allocator> &V);
@@ -32,6 +32,7 @@ public:
     // 只读访问接口
     const T &operator[](Rank r) const;
     Rank size() const;
+    Rank capacity() const;
     bool empty() const;
     int disordered() const;
     Rank find(const T &e) const;
@@ -58,10 +59,11 @@ public:
     template <typename VST> void traverse(VST &);
 private:
     using AllocTraits = std::allocator_traits<Allocator>;
+    static Allocator allocator;
+
     Rank _size;
     int _capacity;
     T *_elem;
-    Allocator allocator;
 
     void copyFrom(const T *A, Rank lo, Rank hi);
     void expand();
@@ -81,16 +83,20 @@ private:
 };
 
 template <typename T, typename Allocator>
+Allocator Vector<T, Allocator>::allocator{ };
+
+template <typename T, typename Allocator>
 // T: default_constructable copy_assignable
 Vector<T, Allocator>::Vector(int c, int s, const T &v) :
-    _size(0), _capacity(c), _elem(allocator.allocate(c)) // check: size of c
+    _size(s), _capacity(c), _elem(allocator.allocate(c)) // check: size of c
     // _size(0), _capacity(c), _elem(new T[c]) // check: size of c
 {
     // assert 0 <= s && s <= c
-    while (_size < s) {
+    // while (_size < s) {
         // _elem[_size++] = v;
-        AllocTraits::construct(allocator, _elem + _size++, v);
-    }
+        // AllocTraits::construct(allocator, _elem + _size++, v);
+    // }
+    std::uninitialized_fill_n(_elem, _size, v);
 }
 
 template <typename T, typename Allocator>
@@ -123,6 +129,10 @@ const T &Vector<T, Allocator>::operator[](Rank r) const
 template <typename T, typename Allocator>
 Vector<T, Allocator>::Rank Vector<T, Allocator>::size() const
 { return _size; }
+
+template <typename T, typename Allocator>
+Vector<T, Allocator>::Rank Vector<T, Allocator>::capacity() const
+{ return _capacity; }
 
 template <typename T, typename Allocator>
 bool Vector<T, Allocator>::empty() const
@@ -186,10 +196,11 @@ T Vector<T, Allocator>::remove(Rank lo, Rank hi)
     while (hi != _size) {
         _elem[lo++] = _elem[hi++];
     }
-    // _size = lo;
-    while (lo < _size) {
-        AllocTraits::destroy(allocator, _elem + --_size);
-    }
+    // while (lo < _size) {
+    //     AllocTraits::destroy(allocator, _elem + --_size);
+    // }
+    std::destroy(_elem + lo, _elem + _size);
+    _size = lo;
     return ret;
 }
 
@@ -262,9 +273,10 @@ template <typename T, typename Allocator>
 void Vector<T, Allocator>::free()
 {
     // delete [] _elem;
-    while (0 < _size) {
-        AllocTraits::destroy(allocator, _elem + --_size);
-    }
+    // while (0 < _size) {
+    //     AllocTraits::destroy(allocator, _elem + --_size);
+    // }
+    std::destroy_n(_elem, _size);
     allocator.deallocate(_elem, _capacity);
 }
 
@@ -274,11 +286,12 @@ T *Vector<T, Allocator>::alloc_copy(int capacity, const T *A, Rank lo, Rank hi)
     // assert 0 <= lo && lo <= hi
     // auto newElem = new T[capacity];
     auto newElem = allocator.allocate(capacity);
-    Rank size = 0;
-    while (lo != hi) {
+    // Rank size = 0;
+    // while (lo != hi) {
         // newElem[size++] = A[lo++];
-        AllocTraits::construct(allocator, newElem + size++, A[lo++]);
-    }
+    //     AllocTraits::construct(allocator, newElem + size++, A[lo++]);
+    // }
+    std::uninitialized_copy(A + lo, A + hi, newElem);
     return newElem;
 }
 
