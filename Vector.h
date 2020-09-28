@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-28 14:36:21
+ * @LastEditTime : 2020-09-28 15:29:46
  */
 
 #ifndef VECTOR__H
@@ -193,14 +193,15 @@ T Vector<T, Allocator>::remove(Rank lo, Rank hi)
     // assert 0 <= lo && lo < hi && hi <= _size
     assert(lo < hi);
     T ret = _elem[hi - 1];
-    while (hi != _size) {
-        _elem[lo++] = _elem[hi++];
-    }
+    // while (hi != _size) {
+    //     _elem[lo++] = _elem[hi++];
+    // }
+    auto last = std::move(_elem + hi, _elem + _size, _elem + lo);
     // while (lo < _size) {
     //     AllocTraits::destroy(allocator, _elem + --_size);
     // }
-    std::destroy(_elem + lo, _elem + _size);
-    _size = lo;
+    std::destroy(last, _elem + _size);
+    _size = last - _elem;
     return ret;
 }
 
@@ -217,13 +218,14 @@ Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(Rank r, const T &e)
         _capacity = newCapacity;
         _elem = newElem;
     }
-    Rank i = _size;
     AllocTraits::construct(allocator, _elem + _size, T());
-    while (i != r) {
-        _elem[i] = _elem[i - 1];
-        --i;
-    }
-    _elem[i] = e;
+    // Rank i = _size;
+    // while (i != r) {
+    //     _elem[i] = _elem[i - 1];
+    //     --i;
+    // }
+    std::copy_backward(_elem + r, _elem + _size, _elem + _size + 1);
+    _elem[r] = e;
     ++_size;
     return r;
 }
@@ -235,21 +237,23 @@ Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(const T &e)
 // template <typename T, typename Allocator>
 // void Vector<T, Allocator>::sort(Rank lo, Rank hi);
 
-// template <typename T, typename Allocator>
-// void Vector<T, Allocator>::sort();
+template <typename T, typename Allocator>
+void Vector<T, Allocator>::sort()
+{ sort(0, _size); }
 
 // template <typename T, typename Allocator>
 // void Vector<T, Allocator>::unsort(Rank lo, Rank hi);
 
-// template <typename T, typename Allocator>
-// void Vector<T, Allocator>::unsort();
+template <typename T, typename Allocator>
+void Vector<T, Allocator>::unsort()
+{ unsort(0, _size); }
 
 // template <typename T, typename Allocator>
 // int Vector<T, Allocator>::deduplicate();
 
-
 // template <typename T, typename Allocator>
 // int Vector<T, Allocator>::uniquify();
+
 
 // void traverse(void(*)(T&));
 // template <typename VST> void traverse(VST &);
