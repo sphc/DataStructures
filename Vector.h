@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-28 15:29:46
+ * @LastEditTime : 2020-09-30 09:31:49
  */
 
 #ifndef VECTOR__H
@@ -25,6 +25,7 @@ public:
     explicit Vector(int c = DefaultCapacity, int s = 0, const T &v = T{});
     Vector(const T *A, Rank n);
     Vector(const T *A, Rank lo, Rank hi);
+    Vector(Vector<T, Allocator> &&V) = delete;
     Vector(const Vector<T, Allocator> &V);
     Vector(const Vector<T, Allocator> &V, Rank lo, Rank hi);
     ~Vector();
@@ -34,6 +35,7 @@ public:
     Rank size() const;
     Rank capacity() const;
     bool empty() const;
+    //返回相邻逆序元素对的总数
     int disordered() const;
     Rank find(const T &e) const;
     Rank find(const T &e, Rank lo, Rank hi) const;
@@ -42,6 +44,7 @@ public:
 
     // 可写访问接口
     T &operator[](Rank r);
+    Vector<T, Allocator> &operator=(Vector<T, Allocator> &&rhs) = delete;
     Vector<T, Allocator> &operator=(const Vector<T, Allocator> &rhs);
     T remove(Rank r);
     T remove(Rank lo, Rank hi);
@@ -51,7 +54,9 @@ public:
     void sort();
     void unsort(Rank lo, Rank hi);
     void unsort();
+    // 无序向量去重
     int deduplicate();
+    // 有序向量去重
     int uniquify();
 
     // 遍历
@@ -196,7 +201,7 @@ T Vector<T, Allocator>::remove(Rank lo, Rank hi)
     // while (hi != _size) {
     //     _elem[lo++] = _elem[hi++];
     // }
-    auto last = std::move(_elem + hi, _elem + _size, _elem + lo);
+    auto last = std::copy(_elem + hi, _elem + _size, _elem + lo);
     // while (lo < _size) {
     //     AllocTraits::destroy(allocator, _elem + --_size);
     // }
@@ -218,14 +223,18 @@ Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(Rank r, const T &e)
         _capacity = newCapacity;
         _elem = newElem;
     }
-    AllocTraits::construct(allocator, _elem + _size, T());
-    // Rank i = _size;
-    // while (i != r) {
-    //     _elem[i] = _elem[i - 1];
-    //     --i;
-    // }
-    std::copy_backward(_elem + r, _elem + _size, _elem + _size + 1);
-    _elem[r] = e;
+    if (r == _size) {
+        AllocTraits::construct(allocator, _elem + _size, e);
+    } else {
+        AllocTraits::construct(allocator, _elem + _size, T());
+        // Rank i = _size;
+        // while (i != r) {
+        //     _elem[i] = _elem[i - 1];
+        //     --i;
+        // }
+        std::copy_backward(_elem + r, _elem + _size, _elem + _size + 1);
+        _elem[r] = e;
+    }
     ++_size;
     return r;
 }
@@ -248,8 +257,16 @@ template <typename T, typename Allocator>
 void Vector<T, Allocator>::unsort()
 { unsort(0, _size); }
 
-// template <typename T, typename Allocator>
-// int Vector<T, Allocator>::deduplicate();
+// 未测试
+template <typename T, typename Allocator>
+int Vector<T, Allocator>::deduplicate()
+{
+    for (Rank i = 0; i < size(); ++i) {
+        while ((auto ret = find(_elem[i], i + 1, size())) > i) {
+            remove(ret);
+        }
+    }
+}
 
 // template <typename T, typename Allocator>
 // int Vector<T, Allocator>::uniquify();

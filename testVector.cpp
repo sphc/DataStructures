@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-28 15:39:17
+ * @LastEditTime : 2020-09-29 15:03:42
  */
 
 #include "Test.h"
@@ -18,6 +18,18 @@ void printVector(const Vector<T> &v)
     }
     std::cout << std::endl;
 }
+
+// template <typename T>
+// class AddSpace {
+// public:
+//     AddSpace(const T &obj) : ref(obj) { }
+// private:
+//     const T &ref;
+// };
+
+// template <typename T>
+// std::ostream &operator<<(std::ostream &os, AddSpace<T> rhs)
+// { return os << rhs.ref << ' '; }
 
 int main()
 {
