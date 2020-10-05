@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-30 09:31:49
+ * @LastEditTime : 2020-10-05 21:03:11
  */
 
 #ifndef VECTOR__H
@@ -12,56 +12,81 @@
 
 #include <iostream>
 #include <memory>
+#include <algorithm>
 #include <utility>
 #include <cassert>
 
-inline const int DefaultCapacity = 3;
+inline const int DefaultCapacity = 3; // 默认的初始容量
 
 template <typename T, typename Allocator = std::allocator<T>>
 class Vector {
 public:
-    typedef int Rank;
+    typedef int Rank; // 秩
 
-    explicit Vector(int c = DefaultCapacity, int s = 0, const T &v = T{});
+    // 构造函数
+    // OK
+    explicit Vector(int c = DefaultCapacity, int s = 0, const T &v = T{}); // 容量c、规模s、元素初始值v
+    // OK
     Vector(const T *A, Rank n);
+    // OK
     Vector(const T *A, Rank lo, Rank hi);
     Vector(Vector<T, Allocator> &&V) = delete;
+    // OK
     Vector(const Vector<T, Allocator> &V);
+    // OK
     Vector(const Vector<T, Allocator> &V, Rank lo, Rank hi);
+
+    // 析构函数
+    // OK
     ~Vector();
 
     // 只读访问接口
+    // OK
     const T &operator[](Rank r) const;
+    // OK
     Rank size() const;
     Rank capacity() const;
-    bool empty() const;
-    //返回相邻逆序元素对的总数
+    // OK
+    bool empty() const; // 返回相邻逆序元素对的总数
+    // OK
     int disordered() const;
-    Rank find(const T &e) const;
-    Rank find(const T &e, Rank lo, Rank hi) const;
-    Rank search(const T &e) const;
-    Rank search(const T &e, Rank lo, Rank hi) const;
+    // OK
+    Rank find(const T &e) const; // 无序向量查找
+    // OK
+    Rank find(const T &e, Rank lo, Rank hi) const; // 无序向量查找
+    Rank search(const T &e) const; // 有序向量查找
+    Rank search(const T &e, Rank lo, Rank hi) const; // 有序向量查找
 
     // 可写访问接口
+    // OK
     T &operator[](Rank r);
     Vector<T, Allocator> &operator=(Vector<T, Allocator> &&rhs) = delete;
+    // OK
     Vector<T, Allocator> &operator=(const Vector<T, Allocator> &rhs);
+    // OK
     T remove(Rank r);
-    T remove(Rank lo, Rank hi);
+    // OK
+    int remove(Rank lo, Rank hi);
+    // OK
     Rank insert(Rank r, const T &e);
-    Rank insert(const T &e);
+    // OK
+    Rank insert(const T &e); // 默认作为末元素插入
     void sort(Rank lo, Rank hi);
+    // OK
     void sort();
     void unsort(Rank lo, Rank hi);
+    // OK
     void unsort();
-    // 无序向量去重
-    int deduplicate();
-    // 有序向量去重
-    int uniquify();
+    // OK
+    int deduplicate(); // 无序向量去重
+    // OK
+    int uniquify(); // 有序向量去重
 
     // 遍历
-    void traverse(void(*)(T&));
-    template <typename VST> void traverse(VST &);
+    // OK
+    void traverse(void (*visit)(T &));
+    // OK
+    template <typename VST> void traverse(VST &visit);
 private:
     using AllocTraits = std::allocator_traits<Allocator>;
     static Allocator allocator;
@@ -70,20 +95,21 @@ private:
     int _capacity;
     T *_elem;
 
-    void copyFrom(const T *A, Rank lo, Rank hi);
-    void expand();
+    // void expand();
     void shrink();
-    bool bubble(Rank lo, Rank hi);
-    void bubbleSort(Rank lo, Rank hi);
-    Rank max(Rank lo, Rank hi);
-    void selectionSort(Rank lo, Rank hi);
-    void merge(Rank lo, Rank mi, Rank hi);
-    void mergeSort(Rank lo, Rank hi);
-    Rank partition(Rank lo, Rank hi);
-    void quickSort(Rank lo, Rank hi);
-    void heapSort(Rank lo, Rank hi);
+    bool bubble(Rank lo, Rank hi); // 扫描交换
+    void bubbleSort(Rank lo, Rank hi); // 起泡排序算法
+    void merge(Rank lo, Rank mi, Rank hi); // 归并算法
+    void mergeSort(Rank lo, Rank hi); // 归并排序算法
 
-    void free();
+    Rank max(Rank lo, Rank hi); // 选取最大元素
+    void selectionSort(Rank lo, Rank hi); // 选择排序算法
+    Rank partition(Rank lo, Rank hi); // 轴点构造算法
+    void quickSort(Rank lo, Rank hi); // 快速排序算法
+    void heapSort(Rank lo, Rank hi); // 堆排序
+
+    void free(); // 释放内部空间
+    // 分配capacity的空间，并拷贝A[lo, hi)至新的空间，返回新空间的首地址
     T *alloc_copy(int capacity, const T *A, Rank lo, Rank hi);
 };
 
@@ -190,24 +216,29 @@ Vector<T, Allocator> &Vector<T, Allocator>::operator=(const Vector<T, Allocator>
 }
 
 template <typename T, typename Allocator>
-T Vector<T, Allocator>::remove(Rank r) { return remove(r, r + 1); }
+T Vector<T, Allocator>::remove(Rank r)
+{
+    // assert 0 <= r && r < _size
+    T ret = _elem[r];
+    remove(r, r + 1);
+    return ret;
+}
 
 template <typename T, typename Allocator>
-T Vector<T, Allocator>::remove(Rank lo, Rank hi)
+int Vector<T, Allocator>::remove(Rank lo, Rank hi)
 {
-    // assert 0 <= lo && lo < hi && hi <= _size
-    assert(lo < hi);
-    T ret = _elem[hi - 1];
+    // assert 0 <= lo && lo <= hi && hi <= _size
     // while (hi != _size) {
     //     _elem[lo++] = _elem[hi++];
     // }
+    if (lo == hi) { return 0; }
     auto last = std::copy(_elem + hi, _elem + _size, _elem + lo);
     // while (lo < _size) {
     //     AllocTraits::destroy(allocator, _elem + --_size);
     // }
     std::destroy(last, _elem + _size);
     _size = last - _elem;
-    return ret;
+    return hi - lo;
 }
 
 template <typename T, typename Allocator>
@@ -241,42 +272,83 @@ Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(Rank r, const T &e)
 
 template <typename T, typename Allocator>
 Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(const T &e)
-{ return insert(size(), e); }
+{ return insert(_size, e); }
 
+// 未测试
 // template <typename T, typename Allocator>
 // void Vector<T, Allocator>::sort(Rank lo, Rank hi);
 
+// 未测试
 template <typename T, typename Allocator>
 void Vector<T, Allocator>::sort()
 { sort(0, _size); }
 
+// 未测试
 // template <typename T, typename Allocator>
-// void Vector<T, Allocator>::unsort(Rank lo, Rank hi);
+// void Vector<T, Allocator>::unsort(Rank lo, Rank hi)
+// {
+// }
 
+// 未测试
 template <typename T, typename Allocator>
 void Vector<T, Allocator>::unsort()
 { unsort(0, _size); }
 
-// 未测试
 template <typename T, typename Allocator>
 int Vector<T, Allocator>::deduplicate()
 {
-    for (Rank i = 0; i < size(); ++i) {
-        while ((auto ret = find(_elem[i], i + 1, size())) > i) {
-            remove(ret);
+    auto oldSize = size();
+    // for (Rank i = 0; i < size() - 1; ++i) {
+    //     auto ret = find(_elem[i], i + 1, size());
+    //     while (i < ret) {
+    //         remove(ret);
+    //         ret = find(_elem[i], i + 1, size());
+    //     }
+    // }
+    for (Rank i = 1; i < size();) {
+        if (auto ret = find(_elem[i], 0, i); -1 < ret) {
+            remove(i);
+        } else {
+            ++i;
         }
+    }
+    return oldSize - size();
+}
+
+template <typename T, typename Allocator>
+int Vector<T, Allocator>::uniquify()
+{
+    if (0 == size() || 1 == size()) { return 0; }
+    Rank i = 0;
+    for (Rank j = i + 1; j < size(); ++j) {
+        if (_elem[j] != _elem[i]) {
+            _elem[++i] = _elem[j];
+        }
+    }
+    int cnt = _size - i - 1;
+    _size = i + 1;
+    std::destroy_n(_elem + _size, cnt);
+    return cnt;
+}
+
+template <typename T, typename Allocator>
+void Vector<T, Allocator>::traverse(void (*visit)(T &))
+{
+    for (Rank i = 0; i < size(); ++i) {
+        visit(_elem[i]);
     }
 }
 
-// template <typename T, typename Allocator>
-// int Vector<T, Allocator>::uniquify();
+template <typename T, typename Allocator>
+template <typename VST>
+void Vector<T, Allocator>::traverse(VST &visit)
+{
+    for (Rank i = 0; i < size(); ++i) {
+        visit(_elem[i]);
+    }
+}
 
 
-// void traverse(void(*)(T&));
-// template <typename VST> void traverse(VST &);
-
-
-// void copyFrom(const T *A, Rank lo, Rank hi);
 // void expand();
 // void shrink();
 // bool bubble(Rank lo, Rank hi);

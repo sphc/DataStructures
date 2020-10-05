@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-09-29 15:03:42
+ * @LastEditTime : 2020-10-05 21:01:20
  */
 
 #include "Test.h"
@@ -18,6 +18,13 @@ void printVector(const Vector<T> &v)
     }
     std::cout << std::endl;
 }
+
+void f(int &n) { std::cout << n << " "; }
+
+class F {
+public:
+    void operator()(int n) { std::cout << n << ", "; }
+};
 
 // template <typename T>
 // class AddSpace {
@@ -105,6 +112,81 @@ int main()
     // // v11.remove(2);
     // v11.remove(2, 4);
     // printVector(v11);
+
+    Vector<int> v12;
+    v12.insert(20);
+    v12.insert(10);
+    v12.insert(21);
+    v12.insert(30);
+    v12.insert(25);
+    v12.insert(15);
+    v12.insert(20);
+    v12.insert(17);
+    v12.insert(27);
+    v12.insert(20);
+    v12.insert(24);
+    v12.insert(16);
+    v12.insert(20);
+    v12.insert(17);
+    v12.insert(27);
+    v12.insert(20);
+    v12.insert(24);
+    v12.insert(16);
+    for (int i = 10; i < 35; ++i) {
+        v12.insert(i);
+    }
+    v12.traverse(f);
+    std::cout << std::endl;
+    auto del_cnt = v12.deduplicate();
+    std::cout << "delete " << del_cnt << " element" << (1 < del_cnt ? "s." : ".") << std::endl;
+    auto fobj = F{};
+    v12.traverse(fobj);
+    std::cout << std::endl;
+
+    // Vector<int> v13;
+    // v13.insert(10);
+    // v13.insert(10);
+    // v13.insert(10);
+    // v13.insert(11);
+    // v13.insert(13);
+    // v13.insert(15);
+    // v13.insert(15);
+    // v13.insert(15);
+    // v13.insert(15);
+    // v13.insert(17);
+    // v13.insert(19);
+    // v13.insert(21);
+    // v13.insert(21);
+    // v13.insert(21);
+    // v13.insert(21);
+    // v13.insert(21);
+    // v13.insert(23);
+    // v13.insert(25);
+    // v13.insert(28);
+    // v13.insert(33);
+    // v13.insert(33);
+    // v13.insert(33);
+    // v13.insert(33);
+    // v13.insert(35);
+    // v13.insert(35);
+    // v13.insert(37);
+    // v13.insert(37);
+    // v13.insert(39);
+    // v13.insert(39);
+    // v13.insert(39);
+    // v13.insert(41);
+    // v13.insert(50);
+    // v13.insert(55);
+    // v13.insert(55);
+    // v13.insert(55);
+    // v13.insert(61);
+    // v13.traverse(f);
+    // std::cout << std::endl;
+    // auto del_cnt = v13.uniquify();
+    // std::cout << "delete " << del_cnt << " element" << (1 < del_cnt ? "s." : ".") << std::endl;
+    // auto fobj = F{};
+    // v13.traverse(fobj);
+    // std::cout << std::endl;
 
     return 0;
 }
