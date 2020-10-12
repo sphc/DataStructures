@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-10-05 21:03:11
+ * @LastEditTime : 2020-10-12 21:38:58
  */
 
 #ifndef VECTOR__H
@@ -15,29 +15,22 @@
 #include <algorithm>
 #include <utility>
 #include <cassert>
-
-inline const int DefaultCapacity = 3; // 默认的初始容量
+#include <cstdlib>
 
 template <typename T, typename Allocator = std::allocator<T>>
 class Vector {
 public:
     typedef int Rank; // 秩
 
-    // 构造函数
-    // OK
+    // 构造函数 OK
     explicit Vector(int c = DefaultCapacity, int s = 0, const T &v = T{}); // 容量c、规模s、元素初始值v
-    // OK
     Vector(const T *A, Rank n);
-    // OK
     Vector(const T *A, Rank lo, Rank hi);
     Vector(Vector<T, Allocator> &&V) = delete;
-    // OK
     Vector(const Vector<T, Allocator> &V);
-    // OK
     Vector(const Vector<T, Allocator> &V, Rank lo, Rank hi);
 
-    // 析构函数
-    // OK
+    // 析构函数 OK
     ~Vector();
 
     // 只读访问接口
@@ -74,6 +67,7 @@ public:
     void sort(Rank lo, Rank hi);
     // OK
     void sort();
+    // OK
     void unsort(Rank lo, Rank hi);
     // OK
     void unsort();
@@ -81,22 +75,21 @@ public:
     int deduplicate(); // 无序向量去重
     // OK
     int uniquify(); // 有序向量去重
+    void shrink();
 
-    // 遍历
-    // OK
+    // 遍历 OK
     void traverse(void (*visit)(T &));
-    // OK
     template <typename VST> void traverse(VST &visit);
 private:
     using AllocTraits = std::allocator_traits<Allocator>;
     static Allocator allocator;
+    static const int DefaultCapacity; // 默认的初始容量
 
     Rank _size;
     int _capacity;
     T *_elem;
 
     // void expand();
-    void shrink();
     bool bubble(Rank lo, Rank hi); // 扫描交换
     void bubbleSort(Rank lo, Rank hi); // 起泡排序算法
     void merge(Rank lo, Rank mi, Rank hi); // 归并算法
@@ -115,6 +108,9 @@ private:
 
 template <typename T, typename Allocator>
 Allocator Vector<T, Allocator>::allocator{ };
+
+template <typename T, typename Allocator>
+const int Vector<T, Allocator>::DefaultCapacity = 3;
 
 template <typename T, typename Allocator>
 // T: default_constructable copy_assignable
@@ -283,13 +279,17 @@ template <typename T, typename Allocator>
 void Vector<T, Allocator>::sort()
 { sort(0, _size); }
 
-// 未测试
-// template <typename T, typename Allocator>
-// void Vector<T, Allocator>::unsort(Rank lo, Rank hi)
-// {
-// }
+template <typename T, typename Allocator>
+void Vector<T, Allocator>::unsort(Rank lo, Rank hi)
+{
+    // assert 0 <= lo && lo <= hi
+    using std::swap;
+    auto elems = _elem + lo;
+    for (Rank i = hi - lo; 1 < i; --i) {
+        swap(elems[std::rand() % i], elems[i - 1]);
+    }
+}
 
-// 未测试
 template <typename T, typename Allocator>
 void Vector<T, Allocator>::unsort()
 { unsort(0, _size); }
@@ -329,6 +329,18 @@ int Vector<T, Allocator>::uniquify()
     _size = i + 1;
     std::destroy_n(_elem + _size, cnt);
     return cnt;
+}
+
+template <typename T, typename Allocator>
+void Vector<T, Allocator>::shrink()
+{
+    auto newSize = size();
+    auto newCapacity = newSize ? newSize : 1;
+    auto newElem = alloc_copy(newCapacity, _elem, 0, size());
+    free();
+    _elem = newElem;
+    _size = newSize;
+    _capacity =newCapacity;
 }
 
 template <typename T, typename Allocator>

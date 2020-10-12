@@ -4,11 +4,13 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-10-05 21:01:20
+ * @LastEditTime : 2020-10-12 21:19:22
  */
 
 #include "Test.h"
 #include "Vector.h"
+#include <ctime>
+#include <cstdlib>
 
 template <typename T>
 void printVector(const Vector<T> &v)
@@ -113,35 +115,35 @@ int main()
     // v11.remove(2, 4);
     // printVector(v11);
 
-    Vector<int> v12;
-    v12.insert(20);
-    v12.insert(10);
-    v12.insert(21);
-    v12.insert(30);
-    v12.insert(25);
-    v12.insert(15);
-    v12.insert(20);
-    v12.insert(17);
-    v12.insert(27);
-    v12.insert(20);
-    v12.insert(24);
-    v12.insert(16);
-    v12.insert(20);
-    v12.insert(17);
-    v12.insert(27);
-    v12.insert(20);
-    v12.insert(24);
-    v12.insert(16);
-    for (int i = 10; i < 35; ++i) {
-        v12.insert(i);
-    }
-    v12.traverse(f);
-    std::cout << std::endl;
-    auto del_cnt = v12.deduplicate();
-    std::cout << "delete " << del_cnt << " element" << (1 < del_cnt ? "s." : ".") << std::endl;
-    auto fobj = F{};
-    v12.traverse(fobj);
-    std::cout << std::endl;
+    // Vector<int> v12;
+    // v12.insert(20);
+    // v12.insert(10);
+    // v12.insert(21);
+    // v12.insert(30);
+    // v12.insert(25);
+    // v12.insert(15);
+    // v12.insert(20);
+    // v12.insert(17);
+    // v12.insert(27);
+    // v12.insert(20);
+    // v12.insert(24);
+    // v12.insert(16);
+    // v12.insert(20);
+    // v12.insert(17);
+    // v12.insert(27);
+    // v12.insert(20);
+    // v12.insert(24);
+    // v12.insert(16);
+    // for (int i = 10; i < 35; ++i) {
+    //     v12.insert(i);
+    // }
+    // v12.traverse(f);
+    // std::cout << std::endl;
+    // auto del_cnt = v12.deduplicate();
+    // std::cout << "delete " << del_cnt << " element" << (1 < del_cnt ? "s." : ".") << std::endl;
+    // auto fobj = F{};
+    // v12.traverse(fobj);
+    // std::cout << std::endl;
 
     // Vector<int> v13;
     // v13.insert(10);
@@ -186,6 +188,73 @@ int main()
     // std::cout << "delete " << del_cnt << " element" << (1 < del_cnt ? "s." : ".") << std::endl;
     // auto fobj = F{};
     // v13.traverse(fobj);
+    // std::cout << std::endl;
+
+    std::time_t t;
+    std::srand(static_cast<unsigned>(std::time(&t)));
+    Vector<int> v14;
+    v14.insert(10);
+    v14.insert(11);
+    v14.insert(13);
+    v14.insert(15);
+    v14.insert(17);
+    v14.insert(19);
+    v14.insert(21);
+    v14.insert(23);
+    v14.insert(25);
+    v14.insert(28);
+    v14.insert(33);
+    v14.insert(35);
+    v14.insert(37);
+    v14.insert(39);
+    v14.insert(41);
+    v14.insert(50);
+    v14.insert(55);
+    v14.insert(61);
+    v14.traverse(f);
+    std::cout << std::endl;
+    // v14.unsort(0, 0);
+    // v14.unsort(0, 1);
+    // v14.unsort(0, 2);
+    // v14.unsort(0, 3);
+    // v14.unsort(5, 9);
+    v14.unsort();
+    v14.traverse(f);
+    std::cout << std::endl;
+
+    // Vector<int> v15;
+    // v15.insert(10);
+    // v15.insert(11);
+    // v15.insert(13);
+    // v15.insert(15);
+    // v15.insert(17);
+    // v15.insert(19);
+    // v15.insert(21);
+    // v15.insert(23);
+    // v15.insert(25);
+    // v15.insert(28);
+    // v15.insert(33);
+    // v15.insert(35);
+    // v15.insert(37);
+    // v15.insert(39);
+    // v15.insert(41);
+    // v15.insert(50);
+    // v15.insert(55);
+    // v15.insert(61);
+    // std::cout << "capacity: " << v15.capacity() << ", size: " << v15.size() << std::endl;
+    // v15.traverse(f);
+    // std::cout << std::endl;
+    // v15.shrink();
+    // std::cout << "capacity: " << v15.capacity() << ", size: " << v15.size() << std::endl;
+    // v15.traverse(f);
+    // std::cout << std::endl;
+    // v15.remove(0, v15.size());
+    // std::cout << "capacity: " << v15.capacity() << ", size: " << v15.size() << std::endl;
+    // v15.traverse(f);
+    // std::cout << std::endl;
+    // v15.shrink();
+    // std::cout << "capacity: " << v15.capacity() << ", size: " << v15.size() << std::endl;
+    // v15.traverse(f);
     // std::cout << std::endl;
 
     return 0;
