@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-10-12 21:38:58
+ * @LastEditTime : 2020-10-12 23:32:16
  */
 
 #ifndef VECTOR__H
@@ -17,8 +17,7 @@
 #include <cassert>
 #include <cstdlib>
 
-template <typename T, typename Allocator = std::allocator<T>>
-class Vector {
+template <typename T> class Vector {
 public:
     typedef int Rank; // 秩
 
@@ -26,9 +25,9 @@ public:
     explicit Vector(int c = DefaultCapacity, int s = 0, const T &v = T{}); // 容量c、规模s、元素初始值v
     Vector(const T *A, Rank n);
     Vector(const T *A, Rank lo, Rank hi);
-    Vector(Vector<T, Allocator> &&V) = delete;
-    Vector(const Vector<T, Allocator> &V);
-    Vector(const Vector<T, Allocator> &V, Rank lo, Rank hi);
+    Vector(Vector<T> &&V) = delete;
+    Vector(const Vector<T> &V);
+    Vector(const Vector<T> &V, Rank lo, Rank hi);
 
     // 析构函数 OK
     ~Vector();
@@ -53,9 +52,9 @@ public:
     // 可写访问接口
     // OK
     T &operator[](Rank r);
-    Vector<T, Allocator> &operator=(Vector<T, Allocator> &&rhs) = delete;
+    Vector<T> &operator=(Vector<T> &&rhs) = delete;
     // OK
-    Vector<T, Allocator> &operator=(const Vector<T, Allocator> &rhs);
+    Vector<T> &operator=(const Vector<T> &rhs);
     // OK
     T remove(Rank r);
     // OK
@@ -81,6 +80,7 @@ public:
     void traverse(void (*visit)(T &));
     template <typename VST> void traverse(VST &visit);
 private:
+    using Allocator = std::allocator<T>;
     using AllocTraits = std::allocator_traits<Allocator>;
     static Allocator allocator;
     static const int DefaultCapacity; // 默认的初始容量
@@ -106,15 +106,15 @@ private:
     T *alloc_copy(int capacity, const T *A, Rank lo, Rank hi);
 };
 
-template <typename T, typename Allocator>
-Allocator Vector<T, Allocator>::allocator{ };
+template <typename T>
+Vector<T>::Allocator Vector<T>::allocator{ };
 
-template <typename T, typename Allocator>
-const int Vector<T, Allocator>::DefaultCapacity = 3;
+template <typename T>
+const int Vector<T>::DefaultCapacity = 3;
 
-template <typename T, typename Allocator>
+template <typename T>
 // T: default_constructable copy_assignable
-Vector<T, Allocator>::Vector(int c, int s, const T &v) :
+Vector<T>::Vector(int c, int s, const T &v) :
     _size(s), _capacity(c), _elem(allocator.allocate(c)) // check: size of c
     // _size(0), _capacity(c), _elem(new T[c]) // check: size of c
 {
@@ -126,47 +126,47 @@ Vector<T, Allocator>::Vector(int c, int s, const T &v) :
     std::uninitialized_fill_n(_elem, _size, v);
 }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Vector(const T *A, Rank n) :
+template <typename T>
+Vector<T>::Vector(const T *A, Rank n) :
     Vector(A, 0, n) { }
 
-template <typename T, typename Allocator>
+template <typename T>
 // check: value of lo and hi
 // assert lo <= hi
-Vector<T, Allocator>::Vector(const T *A, Rank lo, Rank hi) :
+Vector<T>::Vector(const T *A, Rank lo, Rank hi) :
     _size(hi - lo), _capacity(_size), _elem(alloc_copy(_capacity, A, lo, hi))
 { }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Vector(const Vector<T, Allocator> &V) :
+template <typename T>
+Vector<T>::Vector(const Vector<T> &V) :
     Vector(V, 0, V.size()) { }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Vector(const Vector<T, Allocator> &V, Rank lo, Rank hi) :
+template <typename T>
+Vector<T>::Vector(const Vector<T> &V, Rank lo, Rank hi) :
     Vector(V._elem, lo, hi) { }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::~Vector() { free(); }
+template <typename T>
+Vector<T>::~Vector() { free(); }
 
 
-template <typename T, typename Allocator>
-const T &Vector<T, Allocator>::operator[](Rank r) const
+template <typename T>
+const T &Vector<T>::operator[](Rank r) const
 { return _elem[r]; }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Rank Vector<T, Allocator>::size() const
+template <typename T>
+Vector<T>::Rank Vector<T>::size() const
 { return _size; }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Rank Vector<T, Allocator>::capacity() const
+template <typename T>
+Vector<T>::Rank Vector<T>::capacity() const
 { return _capacity; }
 
-template <typename T, typename Allocator>
-bool Vector<T, Allocator>::empty() const
+template <typename T>
+bool Vector<T>::empty() const
 { return 0 == size(); }
 
-template <typename T, typename Allocator>
-int Vector<T, Allocator>::disordered() const
+template <typename T>
+int Vector<T>::disordered() const
 {
     int rcnt = 0;
     for (Rank i = 0; i < _size - 1; ++i) {
@@ -177,31 +177,31 @@ int Vector<T, Allocator>::disordered() const
     return rcnt;
 }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Rank Vector<T, Allocator>::find(const T &e) const
+template <typename T>
+Vector<T>::Rank Vector<T>::find(const T &e) const
 { return find(e, 0, _size); }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Rank Vector<T, Allocator>::find(const T &e, Rank lo, Rank hi) const
+template <typename T>
+Vector<T>::Rank Vector<T>::find(const T &e, Rank lo, Rank hi) const
 {
     // assert 0 <= lo && lo <= hi && hi <= _size
     while (lo <= --hi && _elem[hi] != e) { }
     return hi;
 }
 
-// template <typename T, typename Allocator>
-// Vector<T, Allocator>::Rank Vector<T, Allocator>::search(const T &e) const;
+// template <typename T>
+// Vector<T>::Rank Vector<T>::search(const T &e) const;
 
-// template <typename T, typename Allocator>
-// Vector<T, Allocator>::Rank Vector<T, Allocator>::search(const T &e, Rank lo, Rank hi) const;
+// template <typename T>
+// Vector<T>::Rank Vector<T>::search(const T &e, Rank lo, Rank hi) const;
 
 
-template <typename T, typename Allocator>
-T &Vector<T, Allocator>::operator[](Rank r)
+template <typename T>
+T &Vector<T>::operator[](Rank r)
 { return const_cast<T &>(const_cast<const Vector &>(*this)[r]); }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator> &Vector<T, Allocator>::operator=(const Vector<T, Allocator> &rhs)
+template <typename T>
+Vector<T> &Vector<T>::operator=(const Vector<T> &rhs)
 {
     auto newSize = rhs.size();
     auto newElem = alloc_copy(newSize, rhs._elem, 0, rhs.size());
@@ -211,8 +211,8 @@ Vector<T, Allocator> &Vector<T, Allocator>::operator=(const Vector<T, Allocator>
     return *this;
 }
 
-template <typename T, typename Allocator>
-T Vector<T, Allocator>::remove(Rank r)
+template <typename T>
+T Vector<T>::remove(Rank r)
 {
     // assert 0 <= r && r < _size
     T ret = _elem[r];
@@ -220,8 +220,8 @@ T Vector<T, Allocator>::remove(Rank r)
     return ret;
 }
 
-template <typename T, typename Allocator>
-int Vector<T, Allocator>::remove(Rank lo, Rank hi)
+template <typename T>
+int Vector<T>::remove(Rank lo, Rank hi)
 {
     // assert 0 <= lo && lo <= hi && hi <= _size
     // while (hi != _size) {
@@ -237,8 +237,8 @@ int Vector<T, Allocator>::remove(Rank lo, Rank hi)
     return hi - lo;
 }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(Rank r, const T &e)
+template <typename T>
+Vector<T>::Rank Vector<T>::insert(Rank r, const T &e)
 {
     // assert 0 <= r && r <= _size
     if (_size == _capacity) {
@@ -266,21 +266,21 @@ Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(Rank r, const T &e)
     return r;
 }
 
-template <typename T, typename Allocator>
-Vector<T, Allocator>::Rank Vector<T, Allocator>::insert(const T &e)
+template <typename T>
+Vector<T>::Rank Vector<T>::insert(const T &e)
 { return insert(_size, e); }
 
 // 未测试
-// template <typename T, typename Allocator>
-// void Vector<T, Allocator>::sort(Rank lo, Rank hi);
+// template <typename T>
+// void Vector<T>::sort(Rank lo, Rank hi);
 
 // 未测试
-template <typename T, typename Allocator>
-void Vector<T, Allocator>::sort()
+template <typename T>
+void Vector<T>::sort()
 { sort(0, _size); }
 
-template <typename T, typename Allocator>
-void Vector<T, Allocator>::unsort(Rank lo, Rank hi)
+template <typename T>
+void Vector<T>::unsort(Rank lo, Rank hi)
 {
     // assert 0 <= lo && lo <= hi
     using std::swap;
@@ -290,12 +290,12 @@ void Vector<T, Allocator>::unsort(Rank lo, Rank hi)
     }
 }
 
-template <typename T, typename Allocator>
-void Vector<T, Allocator>::unsort()
+template <typename T>
+void Vector<T>::unsort()
 { unsort(0, _size); }
 
-template <typename T, typename Allocator>
-int Vector<T, Allocator>::deduplicate()
+template <typename T>
+int Vector<T>::deduplicate()
 {
     auto oldSize = size();
     // for (Rank i = 0; i < size() - 1; ++i) {
@@ -315,8 +315,8 @@ int Vector<T, Allocator>::deduplicate()
     return oldSize - size();
 }
 
-template <typename T, typename Allocator>
-int Vector<T, Allocator>::uniquify()
+template <typename T>
+int Vector<T>::uniquify()
 {
     if (0 == size() || 1 == size()) { return 0; }
     Rank i = 0;
@@ -331,8 +331,8 @@ int Vector<T, Allocator>::uniquify()
     return cnt;
 }
 
-template <typename T, typename Allocator>
-void Vector<T, Allocator>::shrink()
+template <typename T>
+void Vector<T>::shrink()
 {
     auto newSize = size();
     auto newCapacity = newSize ? newSize : 1;
@@ -343,17 +343,17 @@ void Vector<T, Allocator>::shrink()
     _capacity =newCapacity;
 }
 
-template <typename T, typename Allocator>
-void Vector<T, Allocator>::traverse(void (*visit)(T &))
+template <typename T>
+void Vector<T>::traverse(void (*visit)(T &))
 {
     for (Rank i = 0; i < size(); ++i) {
         visit(_elem[i]);
     }
 }
 
-template <typename T, typename Allocator>
+template <typename T>
 template <typename VST>
-void Vector<T, Allocator>::traverse(VST &visit)
+void Vector<T>::traverse(VST &visit)
 {
     for (Rank i = 0; i < size(); ++i) {
         visit(_elem[i]);
@@ -374,8 +374,8 @@ void Vector<T, Allocator>::traverse(VST &visit)
 // void heapSort(Rank lo, Rank hi);
 
 
-template <typename T, typename Allocator>
-void Vector<T, Allocator>::free()
+template <typename T>
+void Vector<T>::free()
 {
     // delete [] _elem;
     // while (0 < _size) {
@@ -385,8 +385,8 @@ void Vector<T, Allocator>::free()
     allocator.deallocate(_elem, _capacity);
 }
 
-template <typename T, typename Allocator>
-T *Vector<T, Allocator>::alloc_copy(int capacity, const T *A, Rank lo, Rank hi)
+template <typename T>
+T *Vector<T>::alloc_copy(int capacity, const T *A, Rank lo, Rank hi)
 {
     // assert 0 <= lo && lo <= hi
     // auto newElem = new T[capacity];
