@@ -3,3 +3,5 @@ countOnes
 fibBR
 fibI
 fibLR
+LCSI
+LCSR
