@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-09-21 10:45:37
  * @LastEditors  : sphc
- * @LastEditTime : 2020-10-12 21:19:22
+ * @LastEditTime : 2020-10-19 21:22:04
  */
 
 #include "Test.h"
@@ -190,37 +190,37 @@ int main()
     // v13.traverse(fobj);
     // std::cout << std::endl;
 
-    std::time_t t;
-    std::srand(static_cast<unsigned>(std::time(&t)));
-    Vector<int> v14;
-    v14.insert(10);
-    v14.insert(11);
-    v14.insert(13);
-    v14.insert(15);
-    v14.insert(17);
-    v14.insert(19);
-    v14.insert(21);
-    v14.insert(23);
-    v14.insert(25);
-    v14.insert(28);
-    v14.insert(33);
-    v14.insert(35);
-    v14.insert(37);
-    v14.insert(39);
-    v14.insert(41);
-    v14.insert(50);
-    v14.insert(55);
-    v14.insert(61);
-    v14.traverse(f);
-    std::cout << std::endl;
-    // v14.unsort(0, 0);
-    // v14.unsort(0, 1);
-    // v14.unsort(0, 2);
-    // v14.unsort(0, 3);
-    // v14.unsort(5, 9);
-    v14.unsort();
-    v14.traverse(f);
-    std::cout << std::endl;
+    // std::time_t t;
+    // std::srand(static_cast<unsigned>(std::time(&t)));
+    // Vector<int> v14;
+    // v14.insert(10);
+    // v14.insert(11);
+    // v14.insert(13);
+    // v14.insert(15);
+    // v14.insert(17);
+    // v14.insert(19);
+    // v14.insert(21);
+    // v14.insert(23);
+    // v14.insert(25);
+    // v14.insert(28);
+    // v14.insert(33);
+    // v14.insert(35);
+    // v14.insert(37);
+    // v14.insert(39);
+    // v14.insert(41);
+    // v14.insert(50);
+    // v14.insert(55);
+    // v14.insert(61);
+    // v14.traverse(f);
+    // std::cout << std::endl;
+    // // v14.unsort(0, 0);
+    // // v14.unsort(0, 1);
+    // // v14.unsort(0, 2);
+    // // v14.unsort(0, 3);
+    // // v14.unsort(5, 9);
+    // v14.unsort();
+    // v14.traverse(f);
+    // std::cout << std::endl;
 
     // Vector<int> v15;
     // v15.insert(10);
@@ -256,6 +256,45 @@ int main()
     // std::cout << "capacity: " << v15.capacity() << ", size: " << v15.size() << std::endl;
     // v15.traverse(f);
     // std::cout << std::endl;
+
+    Vector<int> v16;
+    // v16.empty(); // test [[nodiscard]]
+    std::cout << "v16.search(21):" << v16.search(21) << std::endl;
+    v16.insert(10);
+    std::cout << "v16.search(21):" << v16.search(21) << std::endl;
+    std::cout << "v16.search(10):" << v16.search(10) << std::endl;
+    v16.insert(11);
+    std::cout << "v16.search(21):" << v16.search(21) << std::endl;
+    std::cout << "v16.search(11):" << v16.search(11) << std::endl;
+    v16.insert(13);
+    std::cout << "v16.search(21):" << v16.search(21) << std::endl;
+    v16.insert(15);
+    v16.insert(17);
+    v16.insert(19);
+    v16.insert(21);
+    std::cout << "v16.search(21):" << v16.search(21) << std::endl;
+    v16.insert(23);
+    v16.insert(25);
+    v16.insert(28);
+    v16.insert(33);
+    v16.insert(35);
+    v16.insert(37);
+    v16.insert(39);
+    v16.insert(41);
+    v16.insert(50);
+    v16.insert(55);
+    v16.insert(61);
+    std::cout << "v16.search(21):" << v16.search(21) << std::endl;
+    std::cout << "v16.search(22):" << v16.search(22) << std::endl;
+    std::cout << "v16.search(21, 3, 3):" << v16.search(21, 3, 3) << std::endl;
+    std::cout << "v16.search(22, 3, 3):" << v16.search(22, 3, 3) << std::endl;
+    std::cout << "v16.search(21, 3, 4):" << v16.search(21, 3, 4) << std::endl;
+    std::cout << "v16.search(22, 3, 4):" << v16.search(15, 3, 4) << std::endl;
+    std::cout << "v16.search(21, 3, 5):" << v16.search(21, 3, 5) << std::endl;
+    std::cout << "v16.search(22, 3, 5):" << v16.search(17, 3, 5) << std::endl;
+    std::cout << "v16.search(21, 3, 7):" << v16.search(21, 3, 7) << std::endl;
+    std::cout << "v16.search(22, 3, 7):" << v16.search(22, 3, 7) << std::endl;
+    // v16.empty(); // test [[nodiscard]]
 
     return 0;
 }

@@ -4,7 +4,7 @@
  * @Email        : jinkai0916@outlook.com
  * @Date         : 2020-08-25 14:45:55
  * @LastEditors  : sphc
- * @LastEditTime : 2020-10-12 23:32:16
+ * @LastEditTime : 2020-10-19 21:40:37
  */
 
 #ifndef VECTOR__H
@@ -39,9 +39,10 @@ public:
     Rank size() const;
     Rank capacity() const;
     // OK
-    bool empty() const; // 返回相邻逆序元素对的总数
+    [[nodiscard]]
+    bool empty() const;
     // OK
-    int disordered() const;
+    int disordered() const; // 返回相邻逆序元素对的总数
     // OK
     Rank find(const T &e) const; // 无序向量查找
     // OK
@@ -100,6 +101,9 @@ private:
     Rank partition(Rank lo, Rank hi); // 轴点构造算法
     void quickSort(Rank lo, Rank hi); // 快速排序算法
     void heapSort(Rank lo, Rank hi); // 堆排序
+
+    Rank binarySearchA(const T &e, Rank lo, Rank hi) const;
+    Rank binarySearchB(const T &e, Rank lo, Rank hi) const;
 
     void free(); // 释放内部空间
     // 分配capacity的空间，并拷贝A[lo, hi)至新的空间，返回新空间的首地址
@@ -189,11 +193,16 @@ Vector<T>::Rank Vector<T>::find(const T &e, Rank lo, Rank hi) const
     return hi;
 }
 
-// template <typename T>
-// Vector<T>::Rank Vector<T>::search(const T &e) const;
+template <typename T>
+Vector<T>::Rank Vector<T>::search(const T &e) const
+{ return search(e, 0, size()); }
 
-// template <typename T>
-// Vector<T>::Rank Vector<T>::search(const T &e, Rank lo, Rank hi) const;
+// 未测试
+template <typename T>
+Vector<T>::Rank Vector<T>::search(const T &e, Rank lo, Rank hi) const
+{
+    return binarySearchA(e, lo, hi);
+}
 
 
 template <typename T>
@@ -282,7 +291,7 @@ void Vector<T>::sort()
 template <typename T>
 void Vector<T>::unsort(Rank lo, Rank hi)
 {
-    // assert 0 <= lo && lo <= hi
+    // assert 0 <= lo && lo <= hi && hi <= _size
     using std::swap;
     auto elems = _elem + lo;
     for (Rank i = hi - lo; 1 < i; --i) {
@@ -373,6 +382,38 @@ void Vector<T>::traverse(VST &visit)
 // void quickSort(Rank lo, Rank hi);
 // void heapSort(Rank lo, Rank hi);
 
+
+template <typename T>
+Vector<T>::Rank Vector<T>::binarySearchA(const T &e, Rank lo, Rank hi) const
+{
+    // assert 0 <= lo <= hi <= size()
+    while (lo < hi) {
+        Rank mi = (lo + hi) / 2;
+        if (e < _elem[mi]) {
+            hi = mi;
+        } else if (_elem[mi] < e) {
+            lo = mi + 1;
+        } else {
+            return mi;
+        }
+    }
+    return -1;
+}
+
+template <typename T>
+Vector<T>::Rank Vector<T>::binarySearchB(const T &e, Rank lo, Rank hi) const
+{
+    // assert 0 <= lo <= hi <= size()
+    while (lo < hi) {
+        Rank mi = (lo + hi) / 2;
+        if (e < _elem[mi]) {
+            hi = mi;
+        } else {
+            lo = mi;
+        }
+    }
+    return -1;
+}
 
 template <typename T>
 void Vector<T>::free()

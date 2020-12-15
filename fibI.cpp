@@ -7,7 +7,7 @@
 //        Author: sphc - jinkai0916@outlook.com
 //   Description: ---
 //       Created: 2020-08-06 13:51:43
-// Last Modified: 2020-08-06 13:56:14
+// Last Modified: 2020-12-10 17:27:53
 //
 //================================================
 
@@ -17,7 +17,7 @@
 //计算Fibonacci数列的第n项（迭代版）：O(n)
 long long fibI(std::size_t n)
 {
-    long long prev = 1, cur = 0;
+    long long prev{1}, cur{0};
     while (n--) {
         cur += prev;
         prev = cur - prev;
